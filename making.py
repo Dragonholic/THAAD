@@ -97,14 +97,14 @@ class Character (GameObject):
 
 
 class Enemy (GameObject):
-    def __init__(self, image, locx, locy, angle, alpha):
+    def __init__(self, image, locx, locy, angle):
         self.image = pygame.image.load(image)
         self.locx = locx
         self.locy = locy
         self.angle = angle
-        self.alpha = alpha
+ #       self.alpha = alpha
 
-        pygame.Surface.set_alpha(self.alpha, flags=0)
+#        self.image = image.set_alpha(1)
 
         resize_factor = 0.5
 
@@ -148,7 +148,7 @@ def kill(game_object):
     return game_object
 
 thaad = spawn(Character(130, 720))
-lv1 = spawn(Enemy('bigbig.png', 1200, 700, 0, 100))
+lv1 = spawn(Enemy('bigbig.png', 1200, 700, 0))
 
 while True:
     screen.fill((255, 255, 255))
