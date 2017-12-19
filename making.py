@@ -7,12 +7,13 @@ from pygame.locals import *
 
 pygame.init()
 
-screen = pygame.display.set_mode((1280, 1024), DOUBLEBUF)
+screen = pygame.display.set_mode((1280, 1024), FULLSCREEN)
 pygame.display.set_caption('THAAD')
 clock = pygame.time.Clock()
 
 FPS = 60
 background = pygame.image.load('back.jpg')
+
 
 
 class GameObject(object):
@@ -88,21 +89,35 @@ class Character (GameObject):
             spawn(Bullet(fire_x, fire_y, self.angle))
 
         # 0 < locx < 1280
-        self.locx = max((0, min((self.locx, 1280))))
+        self.locx = max((-100, min((self.locx, 800))))
 
         # - pi / 6 < rotation < pi / 2
         self.angle = max((- math.pi / 6, min((self.angle, math.pi / 2))))
 
-    def launch(self):
-        pass
 
 
 class Enemy (GameObject):
-    def __init__(self, image, locx, locy, angle):
+    def __init__(self, image, locx, locy, angle, alpha):
         self.image = pygame.image.load(image)
         self.locx = locx
         self.locy = locy
         self.angle = angle
+        self.alpha = alpha
+
+        pygame.Surface.set_alpha(self.alpha, flags=0)
+
+        resize_factor = 0.5
+
+        mw, mh = self.image.get_size()
+        self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
+
+ #   def do_update(self, events):
+  #      self.locx += math.cos(math.pi * 7 / 4 - self.angle) * 30
+   #     self.locy += math.sin(math.pi * 7 / 4 - self.angle) * 30
+#
+ #       # 100 margin
+  #      if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
+   #         kill(self)
 
 
 class Bullet (GameObject):
@@ -132,12 +147,18 @@ def kill(game_object):
     game_objects.remove(game_object)
     return game_object
 
-thaad = spawn(Character(130, 500))
-lv1 = spawn(Enemy('bigbig.png', 1200, 500, 0))
+thaad = spawn(Character(130, 720))
+lv1 = spawn(Enemy('bigbig.png', 1200, 700, 0, 100))
 
 while True:
     screen.fill((255, 255, 255))
     screen.blit(background, (0, 0))
+
+
+
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
 
     events = pygame.event.get()
     for event in events:
@@ -148,6 +169,22 @@ while True:
     for entity in game_objects:
         entity.update(events)
         entity.draw(screen)
+
+
+
+    if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
+        pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
+
+        if click[0]:
+            pygame.quit()
+            sys.exit()
+    else:
+        pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
+
+    font = pygame.font.Font("arialbd.ttf", 40)
+    text = font.render("X", True, (0,0,0), (1242,3))
+    screen.blit(text,(1242,3))
+
 
     pygame.display.flip()
     clock.tick(FPS)
