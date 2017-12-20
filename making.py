@@ -4,7 +4,6 @@ import math
 import pygame
 from pygame.locals import *
 
-
 pygame.init()
 
 screen = pygame.display.set_mode((1280, 1024), FULLSCREEN)
@@ -13,7 +12,6 @@ clock = pygame.time.Clock()
 
 FPS = 60
 background = pygame.image.load('back.jpg')
-
 
 
 class GameObject(object):
@@ -38,7 +36,7 @@ class GameObject(object):
         surface.blit(rot_image, rect)
 
 
-class Character (GameObject):
+class Character(GameObject):
     THAAD_MAIN = 'THAAD_MAIN.png'
     THAAD_TURN = 'thaad_turn.png'
 
@@ -95,37 +93,40 @@ class Character (GameObject):
         self.angle = max((- math.pi / 6, min((self.angle, math.pi / 2))))
 
 
-
-class Enemy (GameObject):
+class Enemy(GameObject):
     def __init__(self, image, locx, locy, angle):
         self.image = pygame.image.load(image)
         self.locx = locx
         self.locy = locy
         self.angle = angle
- #       self.alpha = alpha
+        #      self.alpha = alpha
 
-#        self.image = image.set_alpha(1)
+        #        self.image = image.set_alpha(1)
 
         resize_factor = 0.5
 
         mw, mh = self.image.get_size()
         self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
 
- #   def do_update(self, events):
-  #      self.locx += math.cos(math.pi * 7 / 4 - self.angle) * 30
-   #     self.locy += math.sin(math.pi * 7 / 4 - self.angle) * 30
-#
- #       # 100 margin
-  #      if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
-   #         kill(self)
+    def do_update(self, events):
+        self.locx -= math.cos(math.pi * 7 / 4 - self.angle) * 30
+        self.locy += math.sin(math.pi * 5 / 4 - self.angle) * 30
+
+        if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
+            kill(self)
 
 
-class Bullet (GameObject):
+class Bullet(GameObject):
     def __init__(self, locx, locy, angle):
         self.locx = locx
         self.locy = locy
         self.angle = angle
-        self.image = pygame.image.load("./plane.png")
+        self.image = pygame.image.load("park.png")
+
+        resize_factor = 0.4
+
+        mw, mh = self.image.get_size()
+        self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
 
     def do_update(self, events):
         self.locx += math.cos(math.pi * 7 / 4 - self.angle) * 30
@@ -134,6 +135,11 @@ class Bullet (GameObject):
         # 100 margin
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
+
+            #  if GameObject.tick == int:
+            #     e_locx = self.locx - math.cos(math.pi * 3 / 4 - self.angle) * 30
+            #      e_locy = self.locy + math.sin(math.pi * 3 / 4 - self.angle) * 30
+
 
 game_objects = []
 
@@ -147,6 +153,7 @@ def kill(game_object):
     game_objects.remove(game_object)
     return game_object
 
+
 thaad = spawn(Character(130, 720))
 lv1 = spawn(Enemy('bigbig.png', 1200, 700, 0))
 
@@ -154,11 +161,10 @@ while True:
     screen.fill((255, 255, 255))
     screen.blit(background, (0, 0))
 
-
-
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
+    t = 0
 
     events = pygame.event.get()
     for event in events:
@@ -170,9 +176,7 @@ while True:
         entity.update(events)
         entity.draw(screen)
 
-
-
-    if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
+    if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0:
         pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
 
         if click[0]:
@@ -182,9 +186,8 @@ while True:
         pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
 
     font = pygame.font.Font("arialbd.ttf", 40)
-    text = font.render("X", True, (0,0,0), (1242,3))
-    screen.blit(text,(1242,3))
-
+    text = font.render("X", True, (0, 0, 0), (1242, 3))
+    screen.blit(text, (1242, 3))
 
     pygame.display.flip()
     clock.tick(FPS)
