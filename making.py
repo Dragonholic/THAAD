@@ -13,6 +13,7 @@ clock = pygame.time.Clock()
 
 
 FPS = 60
+start = pygame.image.load('ktm.png')
 background = pygame.image.load('back.jpg')
 
 
@@ -141,7 +142,7 @@ class Bullet (GameObject):
         self.image = pygame.image.load("park.png")
         self.gravity = 0.4
 
-        
+
         resize_factor = 0.4
 
         mw, mh = self.image.get_size()
@@ -201,48 +202,53 @@ def lv5():
 
 
 t=0
-
+init = 0
 
 #실행
 while True:
     screen.fill((255, 255, 255))
-    screen.blit(background, (0, 0))
+    screen.blit(start, (0,0))
 
 
 
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
+    if init == 1:
+        screen.blit(background, (0, 0))
 
 
 
-    events = pygame.event.get()
-    for event in events:
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
 
 
-    for entity in game_objects:
-        entity.update(events)
-        entity.draw(screen)
+
+        events = pygame.event.get()
+        for event in events:
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
 
 
-    if t%30 == 0:
-        lv1()
+        for entity in game_objects:
+            entity.update(events)
+            entity.draw(screen)
+
+
+        if t%30 == 0:
+            lv1()
 
 #게임 종료 버튼
-    if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
-        pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
+        if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
+            pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
 
-        if click[0]:
-             pygame.quit()
-             sys.exit()
-    else:
-        pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
+            if click[0]:
+                 pygame.quit()
+                 sys.exit()
+        else:
+            pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
 
-    font = pygame.font.Font("arialbd.ttf", 40)
-    text = font.render("X", True, (0,0,0), (1242,3))
-    screen.blit(text,(1242,3))
+        font = pygame.font.Font("arialbd.ttf", 40)
+        text = font.render("X", True, (0,0,0), (1242,3))
+        screen.blit(text,(1242,3))
 
 
     pygame.display.flip()
