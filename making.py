@@ -99,7 +99,11 @@ class Enemy(GameObject):
         self.locx = locx
         self.locy = locy
         self.angle = angle
+
         #      self.alpha = alpha
+
+ #      self.alpha = alpha
+
 
         #        self.image = image.set_alpha(1)
 
@@ -136,9 +140,16 @@ class Bullet(GameObject):
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
 
+
             #  if GameObject.tick == int:
             #     e_locx = self.locx - math.cos(math.pi * 3 / 4 - self.angle) * 30
             #      e_locy = self.locy + math.sin(math.pi * 3 / 4 - self.angle) * 30
+
+  #  if GameObject.tick == int:
+   #     e_locx = self.locx - math.cos(math.pi * 3 / 4 - self.angle) * 30
+  #      e_locy = self.locy + math.sin(math.pi * 3 / 4 - self.angle) * 30
+
+
 
 
 game_objects = []
@@ -163,7 +174,6 @@ while True:
 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-
     t = 0
 
     events = pygame.event.get()
@@ -172,11 +182,17 @@ while True:
             pygame.quit()
             sys.exit()
 
+
     for entity in game_objects:
         entity.update(events)
         entity.draw(screen)
 
-    if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0:
+
+
+
+
+    if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
+
         pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
 
         if click[0]:
@@ -191,3 +207,4 @@ while True:
 
     pygame.display.flip()
     clock.tick(FPS)
+
