@@ -102,7 +102,7 @@ class Enemy (GameObject):
         self.locx = locx
         self.locy = locy
         self.angle = angle
- #       self.alpha = alpha
+ #      self.alpha = alpha
 
 #        self.image = image.set_alpha(1)
 
@@ -111,13 +111,12 @@ class Enemy (GameObject):
         mw, mh = self.image.get_size()
         self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
 
- #   def do_update(self, events):
-  #      self.locx += math.cos(math.pi * 7 / 4 - self.angle) * 30
-   #     self.locy += math.sin(math.pi * 7 / 4 - self.angle) * 30
-#
- #       # 100 margin
-  #      if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
-   #         kill(self)
+    def do_update(self, events):
+        self.locx -= math.cos(math.pi * 7 / 4 - self.angle) * 30
+        self.locy += math.sin(math.pi * 5 / 4 - self.angle) * 30
+
+        if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
+            kill(self)
 
 
 class Bullet (GameObject):
@@ -125,7 +124,12 @@ class Bullet (GameObject):
         self.locx = locx
         self.locy = locy
         self.angle = angle
-        self.image = pygame.image.load("./plane.png")
+        self.image = pygame.image.load("park.png")
+
+        resize_factor = 0.4
+
+        mw, mh = self.image.get_size()
+        self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
 
     def do_update(self, events):
         self.locx += math.cos(math.pi * 7 / 4 - self.angle) * 30
@@ -134,6 +138,12 @@ class Bullet (GameObject):
         # 100 margin
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
+
+  #  if GameObject.tick == int:
+   #     e_locx = self.locx - math.cos(math.pi * 3 / 4 - self.angle) * 30
+  #      e_locy = self.locy + math.sin(math.pi * 3 / 4 - self.angle) * 30
+
+
 
 game_objects = []
 
@@ -159,6 +169,7 @@ while True:
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
+    t=0
 
     events = pygame.event.get()
     for event in events:
@@ -166,10 +177,12 @@ while True:
             pygame.quit()
             sys.exit()
 
+
     for entity in game_objects:
         entity.update(events)
         entity.draw(screen)
 
+    
 
 
     if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
@@ -188,3 +201,4 @@ while True:
 
     pygame.display.flip()
     clock.tick(FPS)
+
