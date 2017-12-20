@@ -94,63 +94,55 @@ class Character(GameObject):
 
 
 class Enemy(GameObject):
+
     def __init__(self, image, locx, locy, angle):
         self.image = pygame.image.load(image)
         self.locx = locx
         self.locy = locy
         self.angle = angle
-
-        #      self.alpha = alpha
-
- #      self.alpha = alpha
-
-
-        #        self.image = image.set_alpha(1)
+        self.gravity = 0.5
 
         resize_factor = 0.5
 
         mw, mh = self.image.get_size()
         self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
 
+        self.speed_x = math.cos(math.pi * 7 / 4 - self.angle) * 30
+        self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 30
+
     def do_update(self, events):
-        self.locx -= math.cos(math.pi * 7 / 4 - self.angle) * 30
-        self.locy += math.sin(math.pi * 5 / 4 - self.angle) * 30
+        self.locx -= self.speed_x
+        self.locy += self.speed_y
+        self.speed_y += self.gravity
 
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
 
 
 class Bullet(GameObject):
+
     def __init__(self, locx, locy, angle):
         self.locx = locx
         self.locy = locy
         self.angle = angle
         self.image = pygame.image.load("park.png")
+        self.gravity = 0.4
 
         resize_factor = 0.4
 
         mw, mh = self.image.get_size()
         self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
 
-    def do_update(self, events):
-        self.locx += math.cos(math.pi * 7 / 4 - self.angle) * 30
-        self.locy += math.sin(math.pi * 7 / 4 - self.angle) * 30
+        self.speed_x = math.cos(math.pi * 7 / 4 - self.angle) * 30
+        self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 30
 
-        # 100 margin
+    def do_update(self, events):
+        self.locx += self.speed_x
+        self.locy += self.speed_y
+        self.speed_y += self.gravity
+
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
-
-
-            #  if GameObject.tick == int:
-            #     e_locx = self.locx - math.cos(math.pi * 3 / 4 - self.angle) * 30
-            #      e_locy = self.locy + math.sin(math.pi * 3 / 4 - self.angle) * 30
-
-  #  if GameObject.tick == int:
-   #     e_locx = self.locx - math.cos(math.pi * 3 / 4 - self.angle) * 30
-  #      e_locy = self.locy + math.sin(math.pi * 3 / 4 - self.angle) * 30
-
-
-
 
 game_objects = []
 
@@ -167,6 +159,7 @@ def kill(game_object):
 
 thaad = spawn(Character(130, 720))
 lv1 = spawn(Enemy('bigbig.png', 1200, 700, 0))
+t = 0
 
 while True:
     screen.fill((255, 255, 255))
@@ -174,7 +167,6 @@ while True:
 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-    t = 0
 
     events = pygame.event.get()
     for event in events:
@@ -206,5 +198,5 @@ while True:
     screen.blit(text, (1242, 3))
 
     pygame.display.flip()
+    t += 1
     clock.tick(FPS)
-
