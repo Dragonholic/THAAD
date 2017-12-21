@@ -177,9 +177,6 @@ class Enemy (GameObject):
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
 
-    def get_polygon(self):
-
-
 #사드 탄환 클래스
 class Bullet (GameObject):
     image = pygame.image.load("park.png")
