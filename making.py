@@ -1,6 +1,7 @@
 import sys
 import random
 import math
+from functools import reduce
 import pygame
 from pygame.locals import *
 
@@ -105,7 +106,7 @@ class Character (GameObject):
 
 
 class Enemy (GameObject):
-    images = [pygame.image.load('lodong%d.png' % (i + 1)) for i in range(5)]
+    images = [pygame.image.load('lodong%d.png' % (i + 1)) for i in range(6)]
 
     def __init__(self, image, locx, locy, angle):
         self.image = self.images[image]
@@ -116,6 +117,10 @@ class Enemy (GameObject):
 
 
         resize_factor = 0.7
+
+
+
+
 
         mw, mh = self.image.get_size()
         self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
@@ -135,6 +140,40 @@ class Enemy (GameObject):
 
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
+
+    def get_axis(polygon):
+        sides = []
+
+        def get_side(p1, p2):
+            angle = math.atan2(p1[0] - p2[0], p1[1] - p2[1])
+            sides.append(angle)
+            sides.append(angle + math.pi / 2)
+            return p2
+
+        reduce(get_side, polygon, polygon[-1])
+
+        return sides
+
+    def collision(o1, o2):
+        axes = get_axis(o1) + get_axis(o2)
+        collides = True
+
+        for axis in axes:
+
+            def convert_axis(point):
+                point_atan = math.atan2(point[0], point[1])
+
+                return math.cos(axis - point_atan) * math.sqrt(point[0] ** 2 + point[1] ** 2)
+
+            o1_points = list(map(convert_axis, o1))
+            o2_points = list(map(convert_axis, o2))
+
+            if not (min(o1_points) < max(o2_points) and min(o2_points) < max(o1_points)):
+                    collides = False
+
+        return collides
+
+
 
 #사드 탄환 클래스
 class Bullet (GameObject):
@@ -156,6 +195,27 @@ class Bullet (GameObject):
         self.speed_x = math.cos(math.pi * 7 / 4 - self.angle) * 30
         self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 35
 
+    def collision(o1, o2):
+        axes = get_axis(o1) + get_axis(o2)
+        collides = True
+
+        for axis in axes:
+
+            def convert_axis(point):
+                point_atan = math.atan2(point[0], point[1])
+
+                return math.cos(axis - point_atan) * math.sqrt(point[0] ** 2 + point[1] ** 2)
+
+            o1_points = list(map(convert_axis, o1))
+            o2_points = list(map(convert_axis, o2))
+
+            if not (min(o1_points) < max(o2_points) and min(o2_points) < max(o1_points)):
+                collides = False
+
+        return collides
+
+
+
     def do_update(self, events):
         self.locx += self.speed_x
         self.locy += self.speed_y
@@ -164,6 +224,11 @@ class Bullet (GameObject):
 
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
+
+
+
+
+
 
 
 
@@ -180,6 +245,20 @@ def kill(game_object):
     game_objects.remove(game_object)
     return game_object
 
+def get_axis(polygon):
+    sides = []
+
+    def get_side(p1, p2):
+        angle = math.atan2(p1[0] - p2[0], p1[1] - p2[1])
+        sides.append(angle)
+        sides.append(angle + math.pi / 2)
+        return p2
+
+    reduce(get_side, polygon, polygon[-1])
+
+    return sides
+
+
 
 #사드 메인 캐릭터 스폰
 thaad = spawn(Character(130, 720))
@@ -189,38 +268,45 @@ thaad = spawn(Character(130, 720))
 # 적 미사일 종류별 스폰 함수
 def lv1():
     random_y = random.randrange(500,800)
-    spawn(Enemy(0, 1200, random_y, math.pi * 1/4))
-
+    spawn(Enemy(0, 1300, random_y, math.pi * 1/4))
 def lv2():
-    random_y = random.randrange(500,800)
-    spawn(Enemy(1, 1200, random_y, 0))
+    random_y = random.randrange(300,600)
+    spawn(Enemy(1, 1300, random_y, math.pi * 1/4))
 def lv3():
-    random_y = random.randrange(500,800)
-    spawn(Enemy(2, 1200, random_y, 0))
+    random_y = random.randrange(400,700)
+    spawn(Enemy(2, 1300, random_y, math.pi * 1/4))
 def lv4():
-    random_y = random.randrange(500,800)
-    spawn(Enemy(3, 1200, random_y, 0))
+    random_y = random.randrange(400,800)
+    spawn(Enemy(3, 1300, random_y, math.pi * 1/4))
 def lv5():
-    random_y = random.randrange(500,800)
-    spawn(Enemy(4, 1200, random_y, 0))
-
+    random_y = random.randrange(400,800)
+    spawn(Enemy(4, 1300, random_y, math.pi * 1/4))
+def lv6():
+    random_y = random.randrange(400,800)
+    spawn(Enemy(5, 1300, random_y, math.pi * 1/4))
 
 t=0
-init = 0
 lv = 1
-lv_list = [(lv1, 30), (lv2, 30), (lv3, 30), (lv4, 30), (lv5, 30)]
+lv_list = [lv1,lv2, lv3, lv4, lv5, lv6]
+t_list = [30, 50, 40, 35, 25, 45]
 gamescore = 0
 
 #폰트 리스트
 font_list = [("arialbd.ttf"), ("NanumSquareB.ttf")]
-fontsize_list = [(40), 40]
+fontsize_list = [40, 40]
 
 #폰트 정의
 scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
-scorerender = scorefont.render("세금 : " + str(23) + "", True, (0, 0, 0), (0, 0))
+scorerender = scorefont.render("세금 : " + str(23) + "억", True, (0, 0, 0), (0, 0))
 
 font = pygame.font.Font(font_list[0], fontsize_list[0])
 text = font.render("X", True, (0, 0, 0), (1242, 3))
+
+
+
+
+
+
 
 #실행
 while True:
@@ -250,10 +336,30 @@ while True:
         entity.update(events)
         entity.draw(screen)
 
-    current_lv = lv_list[lv - 1]
 
-    if t % current_lv[1] == 0:
-        current_lv[0]()
+    if t % t_list[0] == 0:
+        lv_list[0]()
+
+    if lv > 1 and t % t_list[1] == 0:
+        lv_list[1]()
+
+    if lv > 2 and t % t_list[2] == 0:
+        lv_list[2]()
+
+    if lv > 3 and t % t_list[3] == 0:
+        lv_list[3]()
+
+    if lv > 4 and t % t_list[4] == 0:
+        lv_list[4]()
+
+    if lv > 5 and t % t_list[5] == 0:
+        lv_list[5]()
+
+    if t % 600 == 0:
+        lv += 1
+
+
+
 
 #게임 종료 버튼
     if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
