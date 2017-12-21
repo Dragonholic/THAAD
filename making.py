@@ -7,7 +7,7 @@ from pygame.locals import *
 
 pygame.init()
 
-screen = pygame.display.set_mode((1280, 1024), FULLSCREEN)
+screen = pygame.display.set_mode((1280, 1024), DOUBLEBUF | FULLSCREEN)
 pygame.display.set_caption('THAAD')
 clock = pygame.time.Clock()
 
@@ -87,7 +87,7 @@ class Character (GameObject):
         if pygame.key.get_pressed()[K_DOWN]:
             self.angle -= math.pi / 90
 
-        if pygame.key.get_pressed()[K_SPACE] and self.tick % 10 == 0:
+        if pygame.key.get_pressed()[K_SPACE] and self.tick % 20 == 0:
             fire_x = self.locx + 140 + math.cos(math.pi * 7 / 4 - self.angle) * 100
             fire_y = self.locy + 240 + math.sin(math.pi * 7 / 4 - self.angle) * 100
             spawn(Bullet(fire_x, fire_y, self.angle))
@@ -102,25 +102,28 @@ class Character (GameObject):
 
 
 #적 미사일 클래스
+
+
 class Enemy (GameObject):
+    images = [pygame.image.load('lodong%d.png' % (i + 1)) for i in range(5)]
+
     def __init__(self, image, locx, locy, angle):
-        self.image = pygame.image.load(image)
+        self.image = self.images[image]
         self.locx = locx
         self.locy = locy
         self.angle = angle
- #      self.alpha = alpha
         self.gravity = 0.5
-#        self.image = image.set_alpha(1)
 
-        resize_factor = 0.8
+
+        resize_factor = 0.7
 
         mw, mh = self.image.get_size()
         self.image = pygame.transform.scale(self.image, (int(mw * resize_factor), int(mh * resize_factor)))
 
 
 
-        self.speed_x = math.cos(math.pi * 7 / 4 - self.angle) * 30
-        self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 30
+        self.speed_x = math.cos(math.pi * 7 / 4 ) * 40
+        self.speed_y = math.sin(math.pi * 7 / 4 ) * 30
 
 
 
@@ -128,20 +131,21 @@ class Enemy (GameObject):
         self.locx -= self.speed_x
         self.locy += self.speed_y
         self.speed_y += self.gravity
+        self.angle += math.pi * 1/120
 
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
 
-
 #사드 탄환 클래스
 class Bullet (GameObject):
+    image = pygame.image.load("park.png")
+
     def __init__(self, locx, locy, angle):
         self.locx = locx
         self.locy = locy
         self.angle = angle
-        self.image = pygame.image.load("park.png")
-        self.gravity = 0.4
-
+        self.gravity = 0.6
+        self.ro_angle = 0
 
         resize_factor = 0.4
 
@@ -150,13 +154,13 @@ class Bullet (GameObject):
 
 
         self.speed_x = math.cos(math.pi * 7 / 4 - self.angle) * 30
-        self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 30
-
+        self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 35
 
     def do_update(self, events):
         self.locx += self.speed_x
         self.locy += self.speed_y
         self.speed_y += self.gravity
+        self.angle += self.gravity
 
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
@@ -185,24 +189,38 @@ thaad = spawn(Character(130, 720))
 # 적 미사일 종류별 스폰 함수
 def lv1():
     random_y = random.randrange(500,800)
-    spawn(Enemy('lodong1.png', 1200, random_y, 0))
+    spawn(Enemy(0, 1200, random_y, math.pi * 1/4))
 
 def lv2():
     random_y = random.randrange(500,800)
-    spawn(Enemy('lodong2.png', 1200, random_y, 0))
+    spawn(Enemy(1, 1200, random_y, 0))
 def lv3():
     random_y = random.randrange(500,800)
-    spawn(Enemy('lodong3.png', 1200, random_y, 0))
+    spawn(Enemy(2, 1200, random_y, 0))
 def lv4():
     random_y = random.randrange(500,800)
-    spawn(Enemy('lodong4.png', 1200, random_y, 0))
+    spawn(Enemy(3, 1200, random_y, 0))
 def lv5():
     random_y = random.randrange(500,800)
-    spawn(Enemy('lodong5.png', 1200, random_y, 0))
+    spawn(Enemy(4, 1200, random_y, 0))
 
 
 t=0
 init = 0
+lv = 1
+lv_list = [(lv1, 30), (lv2, 30), (lv3, 30), (lv4, 30), (lv5, 30)]
+gamescore = 0
+
+#폰트 리스트
+font_list = [("arialbd.ttf"), ("NanumSquareB.ttf")]
+fontsize_list = [(40), 40]
+
+#폰트 정의
+scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
+scorerender = scorefont.render("세금 : " + str(23) + "", True, (0, 0, 0), (0, 0))
+
+font = pygame.font.Font(font_list[0], fontsize_list[0])
+text = font.render("X", True, (0, 0, 0), (1242, 3))
 
 #실행
 while True:
@@ -211,45 +229,46 @@ while True:
 
 
 
-    if init == 1:
-        screen.blit(background, (0, 0))
+
+    screen.blit(background, (0, 0))
 
 
 
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
 
 
 
-        events = pygame.event.get()
-        for event in events:
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+    events = pygame.event.get()
+    for event in events:
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
 
 
-        for entity in game_objects:
-            entity.update(events)
-            entity.draw(screen)
+    for entity in game_objects:
+        entity.update(events)
+        entity.draw(screen)
 
+    current_lv = lv_list[lv - 1]
 
-        if t%30 == 0:
-            lv1()
+    if t % current_lv[1] == 0:
+        current_lv[0]()
 
 #게임 종료 버튼
-        if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
-            pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
+    if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
+        pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
 
-            if click[0]:
-                 pygame.quit()
-                 sys.exit()
-        else:
-            pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
+        if click[0]:
+            pygame.quit()
+            sys.exit()
+    else:
+        pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
 
-        font = pygame.font.Font("arialbd.ttf", 40)
-        text = font.render("X", True, (0,0,0), (1242,3))
-        screen.blit(text,(1242,3))
 
+#폰트
+    screen.blit(text,(1242,3))
+    screen.blit(scorerender, (0,0))
 
     pygame.display.flip()
     t += 1
