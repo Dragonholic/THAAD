@@ -6,7 +6,6 @@ from pygame.locals import *
 
 
 pygame.init()
-
 screen = pygame.display.set_mode((1280, 1024), DOUBLEBUF | FULLSCREEN)
 pygame.display.set_caption('THAAD')
 clock = pygame.time.Clock()
@@ -254,6 +253,7 @@ while True:
 
     if t % current_lv[1] == 0:
         current_lv[0]()
+
 
 #게임 종료 버튼
     if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
