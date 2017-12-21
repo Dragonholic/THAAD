@@ -15,6 +15,13 @@ clock = pygame.time.Clock()
 FPS = 60
 start = pygame.image.load('ktm.png')
 background = pygame.image.load('back.jpg')
+city_img = pygame.image.load("usa.png")
+
+global gamescore
+gamescore = 0
+
+global city
+city = 52
 
 
 def get_axis(polygon):
@@ -176,6 +183,9 @@ class Enemy (GameObject):
 
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
+            global city
+            city -= 1
+
 
 #사드 탄환 클래스
 class Bullet (GameObject):
@@ -207,11 +217,14 @@ class Bullet (GameObject):
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
 
+#충돌 시 반응
         for enemy in game_objects:
             if isinstance(enemy, Enemy):
                 if collision(enemy.get_polygon(), self.get_polygon()):
                     kill(enemy)
                     kill(self)
+                    global gamescore
+                    gamescore += 1000
 
 
 
@@ -232,6 +245,7 @@ def kill(game_object):
     game_objects.remove(game_object)
     return game_object
 
+#충돌 축 함수
 def get_axis(polygon):
     sides = []
 
@@ -276,35 +290,23 @@ t=0
 lv = 1
 lv_list = [lv1,lv2, lv3, lv4, lv5, lv6]
 t_list = [30, 50, 40, 35, 25, 45]
-gamescore = 0
+
 
 #폰트 리스트
 font_list = [("arialbd.ttf"), ("NanumSquareB.ttf")]
 fontsize_list = [40, 40]
 
-#폰트 정의
-scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
-scorerender = scorefont.render("세금 : " + str(23) + "억", True, (0, 0, 0), (0, 0))
-
 font = pygame.font.Font(font_list[0], fontsize_list[0])
 text = font.render("X", True, (0, 0, 0), (1242, 3))
-
-
-
-
-
-
 
 #실행
 while True:
     screen.fill((255, 255, 255))
-    screen.blit(start, (0,0))
-
-
+#    screen.blit(start, (0,0))
 
 
     screen.blit(background, (0, 0))
-
+    screen.blit(city_img, (18, 48))
 
 
     mouse = pygame.mouse.get_pos()
@@ -323,7 +325,7 @@ while True:
         entity.update(events)
         entity.draw(screen)
 
-
+#적 미사일 주기
     if t % t_list[0] == 0:
         lv_list[0]()
 
@@ -345,11 +347,14 @@ while True:
     if t % 600 == 0:
         lv += 1
 
+    # 폰트 정의
+    scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
+    if gamescore < 10000 :
+        scorerender = scorefont.render("세금 : " + str(gamescore) + "억", True, (0, 0, 0), (0, 0))
+    else:
+        scorerender = scorefont.render("세금 : " + str(gamescore//10000) + "조" + str(gamescore%10000) + "억", True, (0, 0, 0), (0, 0))
 
-
-
-
-#게임 종료 버튼
+    #게임 종료 버튼
     if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
         pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
 
@@ -359,10 +364,21 @@ while True:
     else:
         pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
 
+    #게임 오버
+#    if city == 0:
+
+
+    #UI
+    cityfont = pygame.font.Font(font_list[1], fontsize_list[1])
+    cityrender = cityfont.render("X " + str(city), True, (0,0,0), (100, 50))
+
+
 
 #폰트
     screen.blit(text,(1242,3))
     screen.blit(scorerender, (0,0))
+    screen.blit(cityrender, (100, 50))
+
 
     pygame.display.flip()
     t += 1
