@@ -17,6 +17,39 @@ start = pygame.image.load('ktm.png')
 background = pygame.image.load('back.jpg')
 
 
+def get_axis(polygon):
+    sides = []
+
+    def get_side(p1, p2):
+        angle = math.atan2(p1[0] - p2[0], p1[1] - p2[1])
+        sides.append(angle)
+        sides.append(angle + math.pi / 2)
+        return p2
+
+    reduce(get_side, polygon, polygon[-1])
+
+    return sides
+
+
+def collision(o1, o2):
+    axes = get_axis(o1) + get_axis(o2)
+    collides = True
+
+    for axis in axes:
+
+        def convert_axis(point):
+            point_atan = math.atan2(point[0], point[1])
+
+            return math.cos(axis - point_atan) * math.sqrt(point[0] ** 2 + point[1] ** 2)
+
+        o1_points = list(map(convert_axis, o1))
+        o2_points = list(map(convert_axis, o2))
+
+        if not (min(o1_points) < max(o2_points) and min(o2_points) < max(o1_points)):
+            collides = False
+
+    return collides
+
 #게임 오브젝트 클래스
 class GameObject(object):
     locx = 0
@@ -24,6 +57,7 @@ class GameObject(object):
     angle = 0
     image = None
     tick = 0
+    rect = pygame.Rect(0, 0, 0, 0)
 
     def update(self, events):
         self.tick += 1
@@ -36,9 +70,12 @@ class GameObject(object):
         rot_image = pygame.transform.rotate(self.image, self.angle / math.pi * 180)
         rect = rot_image.get_rect()
         rect.center = (self.locx, self.locy)
+        self.rect = rect
 
         surface.blit(rot_image, rect)
 
+    def get_polygon(self):
+        return self.rect.topleft, self.rect.bottomleft, self.rect.bottomright, self.rect.topright
 
 
 #메인캐릭터 클래스
@@ -140,38 +177,7 @@ class Enemy (GameObject):
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
 
-    def get_axis(polygon):
-        sides = []
-
-        def get_side(p1, p2):
-            angle = math.atan2(p1[0] - p2[0], p1[1] - p2[1])
-            sides.append(angle)
-            sides.append(angle + math.pi / 2)
-            return p2
-
-        reduce(get_side, polygon, polygon[-1])
-
-        return sides
-
-    def collision(o1, o2):
-        axes = get_axis(o1) + get_axis(o2)
-        collides = True
-
-        for axis in axes:
-
-            def convert_axis(point):
-                point_atan = math.atan2(point[0], point[1])
-
-                return math.cos(axis - point_atan) * math.sqrt(point[0] ** 2 + point[1] ** 2)
-
-            o1_points = list(map(convert_axis, o1))
-            o2_points = list(map(convert_axis, o2))
-
-            if not (min(o1_points) < max(o2_points) and min(o2_points) < max(o1_points)):
-                    collides = False
-
-        return collides
-
+    def get_polygon(self):
 
 
 #사드 탄환 클래스
@@ -194,26 +200,6 @@ class Bullet (GameObject):
         self.speed_x = math.cos(math.pi * 7 / 4 - self.angle) * 30
         self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 35
 
-    def collision(o1, o2):
-        axes = get_axis(o1) + get_axis(o2)
-        collides = True
-
-        for axis in axes:
-
-            def convert_axis(point):
-                point_atan = math.atan2(point[0], point[1])
-
-                return math.cos(axis - point_atan) * math.sqrt(point[0] ** 2 + point[1] ** 2)
-
-            o1_points = list(map(convert_axis, o1))
-            o2_points = list(map(convert_axis, o2))
-
-            if not (min(o1_points) < max(o2_points) and min(o2_points) < max(o1_points)):
-                collides = False
-
-        return collides
-
-
 
     def do_update(self, events):
         self.locx += self.speed_x
@@ -224,6 +210,11 @@ class Bullet (GameObject):
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
 
+        for enemy in game_objects:
+            if isinstance(enemy, Enemy):
+                if collision(enemy.get_polygon(), self.get_polygon()):
+                    kill(enemy)
+                    kill(self)
 
 
 
