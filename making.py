@@ -15,6 +15,7 @@ clock = pygame.time.Clock()
 FPS = 60
 start = pygame.image.load('ktm.png')
 camo = pygame.image.load('camo.png')
+warning_tape = pygame.image.load('warning_tape.png')
 background = pygame.image.load('back.jpg')
 city_img = pygame.image.load("usa.png")
 
@@ -267,10 +268,6 @@ def get_axis(polygon):
 
 
 
-#사드 메인 캐릭터 스폰
-if game_seq > 0:
-    thaad = spawn(Character(130, 720))
-
 
 
 # 적 미사일 종류별 스폰 함수
@@ -278,26 +275,26 @@ def lv1():
     random_y = random.randrange(500,800)
     spawn(Enemy(0, 1300, random_y, math.pi * 1/4))
 def lv2():
-    random_y = random.randrange(300,600)
+    random_y = random.randrange(300, 600)
     spawn(Enemy(1, 1300, random_y, math.pi * 1/4))
 def lv3():
-    random_y = random.randrange(400,700)
+    random_y = random.randrange(400, 700)
     spawn(Enemy(2, 1300, random_y, math.pi * 1/4))
 def lv4():
-    random_y = random.randrange(400,800)
+    random_y = random.randrange(400, 800)
     spawn(Enemy(3, 1300, random_y, math.pi * 1/4))
 def lv5():
-    random_y = random.randrange(400,800)
+    random_y = random.randrange(400, 800)
     spawn(Enemy(4, 1300, random_y, math.pi * 1/4))
 def lv6():
-    random_y = random.randrange(400,800)
+    random_y = random.randrange(400, 800)
     spawn(Enemy(5, 1300, random_y, math.pi * 1/4))
 
-t=0
+t = 0
 lv = 1
-lv_list = [lv1,lv2, lv3, lv4, lv5, lv6]
+lv_list = [lv1, lv2, lv3, lv4, lv5, lv6]
 t_list = [30, 50, 40, 35, 25, 45]
-
+spawnready = 0
 
 #폰트 리스트
 font_list = [("arialbd.ttf"), ("NanumSquareB.ttf")]
@@ -307,6 +304,7 @@ font = pygame.font.Font(font_list[0], fontsize_list[0])
 cityfont = pygame.font.Font(font_list[1], fontsize_list[1])
 scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
 gamestarttext = pygame.font.Font(font_list[1], fontsize_list[1])
+timerfont = pygame.font.Font(font_list[1], fontsize_list[1])
 
 text = font.render("X", True, (0, 0, 0), (1242, 3))
 
@@ -320,21 +318,17 @@ while True:
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
-    events = pygame.event.get()
-    for event in events:
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-
-    for entity in game_objects:
-        entity.update(events)
-        entity.draw(screen)
-
+    # 사드 메인 캐릭터 스폰
+    if game_seq == 1 and spawnready == 0:
+        thaad = spawn(Character(130, 720))
+        spawnready += 1
 
 #게임 순서별 실행
 
 # 1.게임 시작 화면
     if game_seq == 0:
+        screen.blit(warning_tape, (0, 0))
+        screen.blit(warning_tape, (0, 886))
         screen.blit(start, (0, 150))
         screen.blit(camo, (550, 790))
 
@@ -342,15 +336,13 @@ while True:
         starttextrender = gamestarttext.render("작전 시작", True, (230,230,230), 0)
         screen.blit(starttextrender, (560, 800))
 
-
+        if 550+180 > mouse[0] > 550 and 790 + 62 > mouse[1] > 790 :
+            if click[0]:
+                game_seq += 1
 
 
 # 2. 메인 게임
     if game_seq == 1:
-
-
-
-
         screen.blit(background, (0, 0))
         screen.blit(city_img, (18, 48))
 
@@ -390,21 +382,31 @@ while True:
 
 
 
-#게임 오버
+        #게임 오버
         if city == 0:
             pass
 
 
         #UI
         cityrender = cityfont.render("X " + str(city), True, (0,0,0), (100, 50))
+        timerrender = timerfont.render(str(t/60) + "초", True, (0,0,0),0)
 
 
-
-    #폰트 render
+        #메인 게임 내 폰트 render
         screen.blit(scorerender, (0, 0))
         screen.blit(cityrender, (100, 50))
+        screen.blit(timerrender, (1130, 100))
 
 
+    events = pygame.event.get()
+    for event in events:
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+
+    for entity in game_objects:
+        entity.update(events)
+        entity.draw(screen)
 
 
     # 게임 종료 버튼
