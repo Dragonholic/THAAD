@@ -18,11 +18,14 @@ camo = pygame.image.load('camo.png')
 warning_tape = pygame.image.load('warning_tape.png')
 background = pygame.image.load('back.jpg')
 city_img = pygame.image.load("usa.png")
-
+#over = pygame.image.load("")
 
 
 game_seq = 0
-gameover = 0
+dest_text_lim = 0
+
+global dest
+dest = 0
 
 global gamescore
 gamescore = 0
@@ -192,6 +195,8 @@ class Enemy (GameObject):
             kill(self)
             global city
             city -= 1
+            global dest
+            dest += 1
 
 
 #사드 탄환 클래스
@@ -249,8 +254,6 @@ def spawn(game_object):
 
 #제거 함수
 def kill(game_object):
-    if game_object in game_objects:
-        game_objects.remove(game_object)
 
     return game_object
 
@@ -296,6 +299,7 @@ t = 0
 lv = 1
 lv_list = [lv1, lv2, lv3, lv4, lv5, lv6]
 t_list = [30, 50, 40, 35, 25, 45]
+city_list = ["알라바마 주 Alabama","알래스카 주 Alaska","아리조나 주 Arizona","아칸사스 주 Arkansas","캘리포니아 주 California","콜로라도 주 Colorado","코넷티컷 주 Connecticut","델라웨어 주 Delaware","플로리다 주 Florida" ,"조지아 주 Georgia","하와이 주 Hawaii" ,"아이다호 주 Idaho" ,"일리노이 주 Illinois" ,"인디아나 주 Indiana" ,"아이오와 주 Iowa" ,"캔사스 주 Kansas","켄터키 주 Kentucky" ,"루지아나 주 Louisiana" ,"메인 주 Maine" ,"메릴랜드 주 Maryland","메사추세스 주 Massachusetts" ,"미시건 주 Michigan" ,"미네소타 주 Minnesota" ,"미시시피 주 Mississippi" ,"미주리 주 Missouri" ,"몬타나 주 Montana" ,"네브라스카 주 Nebraska" ,"네바다 주 Nevada" ,"뉴 헹프셔 주 New Hampshire" ,"뉴 저지 주 New Jersey","뉴 멕시코 주 New Mexico" ,"뉴욕 주 New York" ,"노스 캐롤라이나 주 North Carolina" ,"노스 다코타 주 North Dakota" ,"오하이오 주 Ohio" ,"오클라호마 주 Oklahoma" ,"오레곤 주 Oregon","펜실베니아 주 Pennsylvania" ,"로드 아일랜드 주 Rhode Island" ,"사우스 캐롤라이나 주 South Carolina" ,"사우스 다코타 주 South Dakota" ,"테네시 주 Tennesee" ,"텍사스 주 Texas" ,"유타 주 Utah" ,"버몬트 주 Vermont" ,"버지니아 주 Virginia" ,"워싱턴 주 Washington" ,"웨스트 버지니아 주 West Virginia" ,"위스콘신 주 Wisconsin" ,"와이오밍 주 Wyoming"]
 spawnready = 0
 
 #폰트 리스트
@@ -307,6 +311,7 @@ cityfont = pygame.font.Font(font_list[1], fontsize_list[1])
 scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
 gamestarttext = pygame.font.Font(font_list[1], fontsize_list[1])
 timerfont = pygame.font.Font(font_list[1], fontsize_list[1])
+dest_text = pygame.font.Font(font_list[1], fontsize_list[1])
 
 text = font.render("X", True, (0, 0, 0), (1242, 3))
 
@@ -375,8 +380,13 @@ while True:
         if t % 600 == 0:
             lv += 1
 
-        # 폰트 정의
+        if dest > 0:
+            dest_textrender = gamestarttext.render("int(dest)" + "번째 주" + city_list[dest] + "가 파괴되었습니다.", True, (0,0,0,), 0)
+            screen.blit(dest_textrender, (0, 120))
 
+
+
+        # 폰트 정의
         if gamescore < 10000 :
             scorerender = scorefont.render("세금 : " + str(gamescore) + "억", True, (0, 0, 0), (0, 0))
         else:
@@ -386,7 +396,7 @@ while True:
 
         #게임 오버
         if city == 0:
-            pass
+            game_seq += 1
 
 
         #UI
@@ -399,6 +409,11 @@ while True:
         screen.blit(cityrender, (100, 110))
         screen.blit(timerrender, (1200, 60))
 
+        t += 1
+
+    #게임 오버
+    if game_seq == 2:
+        screen.blit(over, (0,0))
 
     events = pygame.event.get()
     for event in events:
@@ -418,7 +433,7 @@ while True:
     else:
         pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
 
-    t += 1
+
 
     if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0 and click[0]:
         pygame.quit()
