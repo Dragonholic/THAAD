@@ -249,7 +249,9 @@ def spawn(game_object):
 
 #제거 함수
 def kill(game_object):
-    game_objects.remove(game_object)
+    if game_object in game_objects:
+        game_objects.remove(game_object)
+
     return game_object
 
 #충돌 축 함수
