@@ -1,0 +1,6 @@
+lv1 : 선전포고
+lv2 : 데프콘 1 발령
+lv3 : 유엔 참전
+lv4 : 미국 불바다
+lv5 : 핵전쟁 발발
+lv6 : NUCLEAR Apocalypse
