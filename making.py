@@ -298,7 +298,7 @@ text = font.render("X", True, (0, 0, 0), (1242, 3))
 #실행
 while True:
     screen.fill((255, 255, 255))
-    screen.blit(start, (0,0))
+
 
 
 
