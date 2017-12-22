@@ -14,8 +14,14 @@ clock = pygame.time.Clock()
 
 FPS = 60
 start = pygame.image.load('ktm.png')
+camo = pygame.image.load('camo.png')
 background = pygame.image.load('back.jpg')
 city_img = pygame.image.load("usa.png")
+
+
+
+game_seq = 0
+gameover = 0
 
 global gamescore
 gamescore = 0
@@ -262,7 +268,8 @@ def get_axis(polygon):
 
 
 #사드 메인 캐릭터 스폰
-thaad = spawn(Character(130, 720))
+if game_seq > 0:
+    thaad = spawn(Character(130, 720))
 
 
 
@@ -297,22 +304,21 @@ font_list = [("arialbd.ttf"), ("NanumSquareB.ttf")]
 fontsize_list = [40, 40]
 
 font = pygame.font.Font(font_list[0], fontsize_list[0])
+cityfont = pygame.font.Font(font_list[1], fontsize_list[1])
+scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
+gamestarttext = pygame.font.Font(font_list[1], fontsize_list[1])
+
 text = font.render("X", True, (0, 0, 0), (1242, 3))
+
+mouse = pygame.mouse.get_pos()
+click = pygame.mouse.get_pressed()
 
 #실행
 while True:
     screen.fill((255, 255, 255))
-#    screen.blit(start, (0,0))
-
-
-    screen.blit(background, (0, 0))
-    screen.blit(city_img, (18, 48))
-
 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-
-
 
     events = pygame.event.get()
     for event in events:
@@ -320,42 +326,89 @@ while True:
             pygame.quit()
             sys.exit()
 
-
     for entity in game_objects:
         entity.update(events)
         entity.draw(screen)
 
-#적 미사일 주기
-    if t % t_list[0] == 0:
-        lv_list[0]()
 
-    if lv > 1 and t % t_list[1] == 0:
-        lv_list[1]()
+#게임 순서별 실행
 
-    if lv > 2 and t % t_list[2] == 0:
-        lv_list[2]()
+# 1.게임 시작 화면
+    if game_seq == 0:
+        screen.blit(start, (0, 150))
+        screen.blit(camo, (550, 790))
 
-    if lv > 3 and t % t_list[3] == 0:
-        lv_list[3]()
 
-    if lv > 4 and t % t_list[4] == 0:
-        lv_list[4]()
+        starttextrender = gamestarttext.render("작전 시작", True, (230,230,230), 0)
+        screen.blit(starttextrender, (560, 800))
 
-    if lv > 5 and t % t_list[5] == 0:
-        lv_list[5]()
 
-    if t % 600 == 0:
-        lv += 1
 
-    # 폰트 정의
-    scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
-    if gamescore < 10000 :
-        scorerender = scorefont.render("세금 : " + str(gamescore) + "억", True, (0, 0, 0), (0, 0))
-    else:
-        scorerender = scorefont.render("세금 : " + str(gamescore//10000) + "조" + str(gamescore%10000) + "억", True, (0, 0, 0), (0, 0))
 
-    #게임 종료 버튼
-    if 1230+50 > mouse[0] > 1230 and 0+50 > mouse[1] > 0 :
+# 2. 메인 게임
+    if game_seq == 1:
+
+
+
+
+        screen.blit(background, (0, 0))
+        screen.blit(city_img, (18, 48))
+
+
+
+
+
+
+    #적 미사일 주기
+        if t % t_list[0] == 0:
+            lv_list[0]()
+
+        if lv > 1 and t % t_list[1] == 0:
+            lv_list[1]()
+
+        if lv > 2 and t % t_list[2] == 0:
+            lv_list[2]()
+
+        if lv > 3 and t % t_list[3] == 0:
+            lv_list[3]()
+
+        if lv > 4 and t % t_list[4] == 0:
+            lv_list[4]()
+
+        if lv > 5 and t % t_list[5] == 0:
+            lv_list[5]()
+
+        if t % 600 == 0:
+            lv += 1
+
+        # 폰트 정의
+
+        if gamescore < 10000 :
+            scorerender = scorefont.render("세금 : " + str(gamescore) + "억", True, (0, 0, 0), (0, 0))
+        else:
+            scorerender = scorefont.render("세금 : " + str(gamescore//10000) + "조" + str(gamescore%10000) + "억", True, (0, 0, 0), (0, 0))
+
+
+
+#게임 오버
+        if city == 0:
+            pass
+
+
+        #UI
+        cityrender = cityfont.render("X " + str(city), True, (0,0,0), (100, 50))
+
+
+
+    #폰트 render
+        screen.blit(scorerender, (0, 0))
+        screen.blit(cityrender, (100, 50))
+
+
+
+
+    # 게임 종료 버튼
+    if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0:
         pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
 
         if click[0]:
@@ -363,24 +416,12 @@ while True:
             sys.exit()
     else:
         pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
+        t += 1
 
-    #게임 오버
-#    if city == 0:
-
-
-    #UI
-    cityfont = pygame.font.Font(font_list[1], fontsize_list[1])
-    cityrender = cityfont.render("X " + str(city), True, (0,0,0), (100, 50))
-
-
-
-#폰트
-    screen.blit(text,(1242,3))
-    screen.blit(scorerender, (0,0))
-    screen.blit(cityrender, (100, 50))
+    screen.blit(text, (1242, 3))
 
 
     pygame.display.flip()
-    t += 1
+
     clock.tick(FPS)
 
