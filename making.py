@@ -344,7 +344,7 @@ while True:
 # 2. 메인 게임
     if game_seq == 1:
         screen.blit(background, (0, 0))
-        screen.blit(city_img, (18, 48))
+        screen.blit(city_img, (18, 108))
 
 
 
@@ -389,13 +389,13 @@ while True:
 
         #UI
         cityrender = cityfont.render("X " + str(city), True, (0,0,0), (100, 50))
-        timerrender = timerfont.render(str(t/60) + "초", True, (0,0,0),0)
+        timerrender = timerfont.render(str(int(t/60)) + "초", True, (0,0,0),0)
 
 
         #메인 게임 내 폰트 render
-        screen.blit(scorerender, (0, 0))
-        screen.blit(cityrender, (100, 50))
-        screen.blit(timerrender, (1130, 100))
+        screen.blit(scorerender, (0, 60))
+        screen.blit(cityrender, (100, 110))
+        screen.blit(timerrender, (1200, 60))
 
 
     events = pygame.event.get()
@@ -413,12 +413,14 @@ while True:
     if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0:
         pygame.draw.rect(screen, (255, 0, 0), (1230, 0, 50, 50))
 
-        if click[0]:
-            pygame.quit()
-            sys.exit()
     else:
         pygame.draw.rect(screen, (155, 0, 0), (1230, 0, 50, 50))
-        t += 1
+
+    t += 1
+
+    if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0 and click[0]:
+        pygame.quit()
+        sys.exit()
 
     screen.blit(text, (1242, 3))
 
