@@ -254,7 +254,8 @@ def spawn(game_object):
 
 #제거 함수
 def kill(game_object):
-
+    if game_object in game_objects:
+        game_objects.remove(game_object)
     return game_object
 
 #충돌 축 함수
@@ -380,9 +381,7 @@ while True:
         if t % 600 == 0:
             lv += 1
 
-        if dest > 0:
-            dest_textrender = gamestarttext.render("int(dest)" + "번째 주" + city_list[dest] + "가 파괴되었습니다.", True, (0,0,0,), 0)
-            screen.blit(dest_textrender, (0, 120))
+
 
 
 
@@ -394,9 +393,6 @@ while True:
 
 
 
-        #게임 오버
-        if city == 0:
-            game_seq += 1
 
 
         #UI
@@ -411,9 +407,6 @@ while True:
 
         t += 1
 
-    #게임 오버
-    if game_seq == 2:
-        screen.blit(over, (0,0))
 
     events = pygame.event.get()
     for event in events:
