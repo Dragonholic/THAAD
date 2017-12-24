@@ -14,15 +14,23 @@ clock = pygame.time.Clock()
 
 FPS = 60
 start = pygame.image.load('ktm.png')
-camo = pygame.image.load('camo.png')
+title = pygame.image.load("title.png")
+button = pygame.image.load('button.png')
 warning_tape = pygame.image.load('warning_tape.png')
 background = pygame.image.load('back.jpg')
 city_img = pygame.image.load("usa.png")
-#over = pygame.image.load("")
+gameover = pygame.image.load("kim.png")
+img_explosion = pygame.image.load('explosion.png')
 
+mw, mh = button.get_size()
+button = pygame.transform.scale(button, (int(mw * 0.72), int(mh * 0.5)))
+
+mw, mh = gameover.get_size()
+gameover = pygame.transform.scale(gameover, (int(mw * 1.01), int(mh * 1.01)))
 
 game_seq = 0
 dest_text_lim = 0
+printscore = 0
 
 global dest
 dest = 0
@@ -32,6 +40,10 @@ gamescore = 0
 
 global city
 city = 52
+
+global explosion
+explosion = []
+
 
 
 def get_axis(polygon):
@@ -93,6 +105,9 @@ class GameObject(object):
 
     def get_polygon(self):
         return self.rect.topleft, self.rect.bottomleft, self.rect.bottomright, self.rect.topright
+
+
+
 
 
 #메인캐릭터 클래스
@@ -166,7 +181,7 @@ class Enemy (GameObject):
         self.locx = locx
         self.locy = locy
         self.angle = angle
-        self.gravity = 0.5
+        self.gravity = 0.6
 
 
         resize_factor = 0.7
@@ -185,11 +200,12 @@ class Enemy (GameObject):
 
 
 
+
     def do_update(self, events):
         self.locx -= self.speed_x
         self.locy += self.speed_y
         self.speed_y += self.gravity
-        self.angle += math.pi * 1/120
+        self.angle += math.pi * 1/150
 
         if self.locx > 1380 or self.locx < -100 or self.locy < -100 or self.locy > 1124:
             kill(self)
@@ -202,6 +218,7 @@ class Enemy (GameObject):
 #사드 탄환 클래스
 class Bullet (GameObject):
     image = pygame.image.load("park.png")
+
 
     def __init__(self, locx, locy, angle):
         self.locx = locx
@@ -218,6 +235,8 @@ class Bullet (GameObject):
 
         self.speed_x = math.cos(math.pi * 7 / 4 - self.angle) * 30
         self.speed_y = math.sin(math.pi * 7 / 4 - self.angle) * 35
+
+
 
 
     def do_update(self, events):
@@ -256,6 +275,7 @@ def spawn(game_object):
 def kill(game_object):
     if game_object in game_objects:
         game_objects.remove(game_object)
+        explosion.append([game_object.locx, game_object.locy, 0])
     return game_object
 
 #충돌 축 함수
@@ -300,21 +320,24 @@ t = 0
 lv = 1
 lv_list = [lv1, lv2, lv3, lv4, lv5, lv6]
 t_list = [30, 50, 40, 35, 25, 45]
-city_list = ["알라바마 주 Alabama","알래스카 주 Alaska","아리조나 주 Arizona","아칸사스 주 Arkansas","캘리포니아 주 California","콜로라도 주 Colorado","코넷티컷 주 Connecticut","델라웨어 주 Delaware","플로리다 주 Florida" ,"조지아 주 Georgia","하와이 주 Hawaii" ,"아이다호 주 Idaho" ,"일리노이 주 Illinois" ,"인디아나 주 Indiana" ,"아이오와 주 Iowa" ,"캔사스 주 Kansas","켄터키 주 Kentucky" ,"루지아나 주 Louisiana" ,"메인 주 Maine" ,"메릴랜드 주 Maryland","메사추세스 주 Massachusetts" ,"미시건 주 Michigan" ,"미네소타 주 Minnesota" ,"미시시피 주 Mississippi" ,"미주리 주 Missouri" ,"몬타나 주 Montana" ,"네브라스카 주 Nebraska" ,"네바다 주 Nevada" ,"뉴 헹프셔 주 New Hampshire" ,"뉴 저지 주 New Jersey","뉴 멕시코 주 New Mexico" ,"뉴욕 주 New York" ,"노스 캐롤라이나 주 North Carolina" ,"노스 다코타 주 North Dakota" ,"오하이오 주 Ohio" ,"오클라호마 주 Oklahoma" ,"오레곤 주 Oregon","펜실베니아 주 Pennsylvania" ,"로드 아일랜드 주 Rhode Island" ,"사우스 캐롤라이나 주 South Carolina" ,"사우스 다코타 주 South Dakota" ,"테네시 주 Tennesee" ,"텍사스 주 Texas" ,"유타 주 Utah" ,"버몬트 주 Vermont" ,"버지니아 주 Virginia" ,"워싱턴 주 Washington" ,"웨스트 버지니아 주 West Virginia" ,"위스콘신 주 Wisconsin" ,"와이오밍 주 Wyoming"]
+city_list = ["워싱턴 D.C.","알라바마 주 Alabama","알래스카 주 Alaska","아리조나 주 Arizona","아칸사스 주 Arkansas","캘리포니아 주 California","콜로라도 주 Colorado","코넷티컷 주 Connecticut","델라웨어 주 Delaware","플로리다 주 Florida" ,"조지아 주 Georgia","하와이 주 Hawaii" ,"아이다호 주 Idaho" ,"일리노이 주 Illinois" ,"인디아나 주 Indiana" ,"아이오와 주 Iowa" ,"캔사스 주 Kansas","켄터키 주 Kentucky" ,"루지아나 주 Louisiana" ,"메인 주 Maine" ,"메릴랜드 주 Maryland","메사추세스 주 Massachusetts" ,"미시건 주 Michigan" ,"미네소타 주 Minnesota" ,"미시시피 주 Mississippi" ,"미주리 주 Missouri" ,"몬타나 주 Montana" ,"네브라스카 주 Nebraska" ,"네바다 주 Nevada" ,"뉴 헹프셔 주 New Hampshire" ,"뉴 저지 주 New Jersey","뉴 멕시코 주 New Mexico" ,"뉴욕 주 New York" ,"노스 캐롤라이나 주 North Carolina" ,"노스 다코타 주 North Dakota" ,"오하이오 주 Ohio" ,"오클라호마 주 Oklahoma" ,"오레곤 주 Oregon","펜실베니아 주 Pennsylvania" ,"로드 아일랜드 주 Rhode Island" ,"사우스 캐롤라이나 주 South Carolina" ,"사우스 다코타 주 South Dakota" ,"테네시 주 Tennesee" ,"텍사스 주 Texas" ,"유타 주 Utah" ,"버몬트 주 Vermont" ,"버지니아 주 Virginia" ,"워싱턴 주 Washington" ,"웨스트 버지니아 주 West Virginia" ,"위스콘신 주 Wisconsin" ,"와이오밍 주 Wyoming", "남한 South Korea"]
 spawnready = 0
 
 #폰트 리스트
 font_list = [("arialbd.ttf"), ("NanumSquareB.ttf")]
-fontsize_list = [40, 40]
+fontsize_list = [40, 40, 20, 30]
 
 font = pygame.font.Font(font_list[0], fontsize_list[0])
 cityfont = pygame.font.Font(font_list[1], fontsize_list[1])
 scorefont = pygame.font.Font(font_list[1], fontsize_list[1])
 gamestarttext = pygame.font.Font(font_list[1], fontsize_list[1])
 timerfont = pygame.font.Font(font_list[1], fontsize_list[1])
-dest_text = pygame.font.Font(font_list[1], fontsize_list[1])
+dest_text = pygame.font.Font(font_list[1], fontsize_list[2])
+gameovertext = pygame.font.Font(font_list[1], fontsize_list[3])
+
 
 text = font.render("X", True, (0, 0, 0), (1242, 3))
+starttextrender = gamestarttext.render("작전 시작", True, (230, 230, 230), 0)
 
 mouse = pygame.mouse.get_pos()
 click = pygame.mouse.get_pressed()
@@ -331,6 +354,10 @@ while True:
         thaad = spawn(Character(130, 720))
         spawnready += 1
 
+
+    if city < 0 :
+        city = 0
+
 #게임 순서별 실행
 
 # 1.게임 시작 화면
@@ -338,16 +365,19 @@ while True:
         screen.blit(warning_tape, (0, 0))
         screen.blit(warning_tape, (0, 886))
         screen.blit(start, (0, 150))
-        screen.blit(camo, (550, 790))
+        screen.blit(button, (550, 790))
+        screen.blit(title, (360, 150))
 
 
-        starttextrender = gamestarttext.render("작전 시작", True, (230,230,230), 0)
         screen.blit(starttextrender, (560, 800))
 
         if 550+180 > mouse[0] > 550 and 790 + 62 > mouse[1] > 790 :
+            starttextrender = gamestarttext.render("작전 시작", True, (230, 230, 30), 0)
+
             if click[0]:
                 game_seq += 1
-
+        else:
+            starttextrender = gamestarttext.render("작전 시작", True, (230, 230, 230), 0)
 
 # 2. 메인 게임
     if game_seq == 1:
@@ -383,14 +413,11 @@ while True:
 
 
 
-
-
         # 폰트 정의
         if gamescore < 10000 :
             scorerender = scorefont.render("세금 : " + str(gamescore) + "억", True, (0, 0, 0), (0, 0))
         else:
             scorerender = scorefont.render("세금 : " + str(gamescore//10000) + "조" + str(gamescore%10000) + "억", True, (0, 0, 0), (0, 0))
-
 
 
 
@@ -403,7 +430,7 @@ while True:
         #메인 게임 내 폰트 render
         screen.blit(scorerender, (0, 60))
         screen.blit(cityrender, (100, 110))
-        screen.blit(timerrender, (1200, 60))
+        screen.blit(timerrender, (1190, 60))
 
         t += 1
 
@@ -418,6 +445,17 @@ while True:
         entity.update(events)
         entity.draw(screen)
 
+    w, h = img_explosion.get_size()
+    for i, ex in enumerate(explosion):
+        ex[2] += 0.05
+        img = pygame.transform.scale(img_explosion, (int(w * ex[2]), int(h * ex[2])))
+
+        screen.blit(img, (ex[0], ex[1]))
+
+        if ex[2] > 1:
+            explosion.pop(i)
+
+
 
     # 게임 종료 버튼
     if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0:
@@ -431,6 +469,8 @@ while True:
     if 1230 + 50 > mouse[0] > 1230 and 0 + 50 > mouse[1] > 0 and click[0]:
         pygame.quit()
         sys.exit()
+
+
 
     screen.blit(text, (1242, 3))
 
