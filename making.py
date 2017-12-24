@@ -420,18 +420,16 @@ while True:
                 screen.blit(dest_textrender, (0, 160))
 
 #            if dest == 52:
- #               dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
-  #              screen.blit(dest_textrender, (0, 160))
+#                dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
+#                screen.blit(dest_textrender, (0, 160))
 
         if city == 0 :
             dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
             screen.blit(dest_textrender, (0, 160))
-
-            if t % 30 == 0:
-                for game_object in game_objects:
-                    kill(game_object)
-                pygame.time.wait(1000)
-                game_seq += 1
+            kill(thaad)
+            spawnready -= 1
+            pygame.time.wait(1000)
+            game_seq += 1
 
 
         # 폰트 정의
