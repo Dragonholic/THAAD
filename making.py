@@ -317,6 +317,7 @@ def lv6():
     spawn(Enemy(5, 1300, random_y, math.pi * 1/4))
 
 t = 0
+endt = 0
 lv = 1
 lv_list = [lv1, lv2, lv3, lv4, lv5, lv6]
 t_list = [30, 50, 40, 35, 25, 45]
@@ -408,28 +409,36 @@ while True:
         if lv > 5 and t % t_list[5] == 0:
             lv_list[5]()
 
-        if t % 600 == 0:
+        if t > 100 and t % 600 == 0:
             lv += 1
 
-        if dest > 0:
-            if dest == 1:
-                dest_textrender = dest_text.render("도시 " + city_list[dest - 1] + "가 파괴되었습니다.", True,(0, 0, 0,), 0)
-                screen.blit(dest_textrender, (0, 160))
-            if 52 > dest > 1:
-                dest_textrender = dest_text.render( "%s번째 주 : " % (dest-1) + city_list[dest-1] + "가 파괴되었습니다." , True, (0,0,0,), 0)
-                screen.blit(dest_textrender, (0, 160))
-
-#            if dest == 52:
-#                dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
-#                screen.blit(dest_textrender, (0, 160))
-
-        if city == 0 :
-            dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
-            screen.blit(dest_textrender, (0, 160))
+        if endt == 1 :
             kill(thaad)
             spawnready -= 1
+
             pygame.time.wait(1000)
+
             game_seq += 1
+
+
+        if city == 0 and endt == 0:
+            dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
+            screen.blit(dest_textrender, (0, 160))
+
+            endt += 1
+
+        if dest > 0 and endt == 0:
+                if dest == 1:
+                    dest_textrender = dest_text.render("도시 " + city_list[dest - 1] + "가 파괴되었습니다.", True, (0, 0, 0,), 0)
+                    screen.blit(dest_textrender, (0, 160))
+                if 52 > dest > 1:
+                    dest_textrender = dest_text.render("%s번째 주 : " % (dest - 1) + city_list[dest - 1] + "가 파괴되었습니다.",
+                                                       True, (0, 0, 0,), 0)
+                    screen.blit(dest_textrender, (0, 160))
+
+                    #            if dest == 52:
+                    #                dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
+                    #                screen.blit(dest_textrender, (0, 160))
 
 
         # 폰트 정의
@@ -473,6 +482,10 @@ while True:
         gamescore = 0
         city = 52
         t = 0
+        endt = 0
+        dest = 0
+        lv = 1
+
 
         if 530 + 270 > mouse[0] > 530 and 900 + 30 > mouse[1] > 900 and click[0]:
             game_seq = 0
