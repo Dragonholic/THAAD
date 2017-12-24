@@ -411,6 +411,27 @@ while True:
         if t % 600 == 0:
             lv += 1
 
+        if dest > 0:
+            if dest == 1:
+                dest_textrender = dest_text.render("도시 " + city_list[dest - 1] + "가 파괴되었습니다.", True,(0, 0, 0,), 0)
+                screen.blit(dest_textrender, (0, 160))
+            if 52 > dest > 1:
+                dest_textrender = dest_text.render( "%s번째 주 : " % (dest-1) + city_list[dest-1] + "가 파괴되었습니다." , True, (0,0,0,), 0)
+                screen.blit(dest_textrender, (0, 160))
+
+#            if dest == 52:
+ #               dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
+  #              screen.blit(dest_textrender, (0, 160))
+
+        if city == 0 :
+            dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
+            screen.blit(dest_textrender, (0, 160))
+
+            if t % 30 == 0:
+                for game_object in game_objects:
+                    kill(game_object)
+                pygame.time.wait(1000)
+                game_seq += 1
 
 
         # 폰트 정의
@@ -433,6 +454,31 @@ while True:
         screen.blit(timerrender, (1190, 60))
 
         t += 1
+
+        if gamescore < 10000 :
+            scorerender_result = scorefont.render("총 세금 : " + str(gamescore) + "억", True, (230, 230, 230), (0, 0))
+        else:
+            scorerender_result = scorefont.render("총 세금 : " + str(gamescore//10000) + "조" + str(gamescore%10000) + "억", True, (230, 230, 230), (0, 0))
+
+
+    #게임 오버
+    if game_seq == 2:
+        screen.blit(gameover, (0,0))
+        screen.blit(scorerender_result, (500, 850))
+
+        if printscore == 0:
+            print("kakin:do-method:score:%d" % (gamescore))
+            printscore = 1
+
+        gameoverrender = gameovertext.render("처음으로 돌아가기", True, (230, 230, 230), 0)
+        screen.blit(gameoverrender, (530, 900))
+        gamescore = 0
+        city = 52
+        t = 0
+
+        if 530 + 270 > mouse[0] > 530 and 900 + 30 > mouse[1] > 900 and click[0]:
+            game_seq = 0
+            printscore = 0
 
 
     events = pygame.event.get()
@@ -478,3 +524,4 @@ while True:
     pygame.display.flip()
 
     clock.tick(FPS)
+
