@@ -412,6 +412,7 @@ while True:
         if t > 100 and t % 600 == 0:
             lv += 1
 
+        #게임오버 받을 시 게임종료 화면 이동
         if endt == 1 :
             kill(thaad)
             spawnready -= 1
@@ -420,7 +421,7 @@ while True:
 
             game_seq += 1
 
-
+        #도시/주 파괴 출력
         if city == 0 and endt == 0:
             dest_textrender = dest_text.render(city_list[dest - 1] + "이 파괴되었습니다.", True, (0, 0, 0,), 0)
             screen.blit(dest_textrender, (0, 160))
@@ -460,8 +461,10 @@ while True:
         screen.blit(cityrender, (100, 110))
         screen.blit(timerrender, (1190, 60))
 
+        #시간
         t += 1
 
+        #게임 스코어 출력
         if gamescore < 10000 :
             scorerender_result = scorefont.render("총 세금 : " + str(gamescore) + "억", True, (230, 230, 230), (0, 0))
         else:
@@ -473,8 +476,10 @@ while True:
         screen.blit(gameover, (0,0))
         screen.blit(scorerender_result, (500, 850))
 
+
+        #게임 스코어 전송
         if printscore == 0:
-            print("kakin:do-method:score:%d" % (gamescore))
+            print("kakin:do-method:score:%d" % gamescore)
             printscore = 1
 
         gameoverrender = gameovertext.render("처음으로 돌아가기", True, (230, 230, 230), 0)
@@ -486,12 +491,13 @@ while True:
         dest = 0
         lv = 1
 
-
+        #초기 화면으로 이동
         if 530 + 270 > mouse[0] > 530 and 900 + 30 > mouse[1] > 900 and click[0]:
             game_seq = 0
             printscore = 0
 
 
+    #이벤트
     events = pygame.event.get()
     for event in events:
         if event.type == QUIT:
@@ -502,6 +508,7 @@ while True:
         entity.update(events)
         entity.draw(screen)
 
+    #폭발 효과
     w, h = img_explosion.get_size()
     for i, ex in enumerate(explosion):
         ex[2] += 0.05
